@@ -307,3 +307,6 @@ grep -rE "THM\{|flag\{" /var /etc /opt /home /root /srv 2>/dev/null
 - **Root:** `THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}`
 - **Root Flag:** `THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}`
 
+  
+
+## 9. Fazer NetCat
