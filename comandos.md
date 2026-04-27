@@ -31,7 +31,7 @@ PORT      STATE SERVICE VERSION
 O scan revelou serviços críticos em portas altas. O FTP (10255) permitia login anônimo e a porta 9736 rodava um servidor PHP, indicando vetores de entrada via exfiltração e web.
 
 ---
-## 2. Exploração de FTP e Exfiltração (com saída dos comandos)
+## 2. Exploração de FTP e Exfiltração
 
 Acesso ao FTP anônimo na porta **10255**, listagem de diretórios ocultos (`...`) e download dos arquivos encontrados.
 
@@ -99,7 +99,7 @@ Hagrid: Oh no harry, y'are steell poking injections around 'ere aren't ya? Go aw
 
 ---
 
-## 3. Quebra de senha do ZIP (com saída dos comandos)
+## 3. Quebra de senha do ZIP 
 
 Tentativa de extração do ZIP revelou que ele estava protegido por senha.
 
@@ -114,7 +114,7 @@ Archive:  .I_saved_it_harry.zip
 [.I_saved_it_harry.zip] boot/.pass password:
 ```
 
-Como o `fcrackzip` não estava instalado, foi usado o **John the Ripper** com `zip2john`.
+Foi usado o **John the Ripper** com `zip2john`.
 
 **Comandos:**
 ```bash
@@ -164,76 +164,7 @@ A senha do ZIP era `anime`, e o arquivo `boot/.pass` revelou credenciais no form
 
 ---
 
-## 4. Enumeração Web / Página inicial (com saída)
-
-**Comando:**
-```bash
-curl -s http://10.10.212.163:9736/
-```
-
-**Saída (trecho relevante):**
-```html
-<title>Hogwart's Royal Entry</title>
-<form class="panda-form" method="POST" action="login.php">
-...
-<!-- Snape: Had you been in my house, I would've kicked you out for trying to get illegally in Hogwarts..
- Dumbledore: Ah, Severus, It's not our choice to make. Minerva?
-Minerva: Oh kick them Albus, I have lost my patience.-->
-```
-
-**Raciocínio:**  
-A aplicação tem um formulário que envia para `login.php`. Os comentários no HTML confirmam que o desafio esconde “lore”/pistas no código-fonte.
-
----
-
-## 4.1. Gobuster (erro explicado com saída)
-
-**Comando:**
-```bash
-gobuster dir -u http://10.10.212.163:9736/ -w /usr/share/wordlists/dirb/common.txt -x php,txt,html
-```
-
-**Saída:**
-```text
-Error: the server returns a status code that matches the provided options for non existing urls. http://10.10.212.163:9736/e9d1480b-ce63-4bd5-9663-3a28371f6108 => 200 (Length: 5187). To continue please exclude the status code or the length
-```
-
-**Raciocínio:**  
-O servidor responde **200** para páginas inexistentes (soft-404), então o gobuster não consegue diferenciar o que existe do que não existe sem filtrar por **tamanho** (`--exclude-length 5187`) ou usar outra estratégia.
-
----
-
-## 5. Porta 43768 (serviço custom via Netcat) + tentativa de resposta
-
-**Comando:**
-```bash
-nc 10.10.212.163 43768
-```
-
-**Saída (banner):**
-```text
-My gifts, friend. (format: Gift1 Gift2 Gift3):
-```
-
-**Tentativa 1 (resposta “lore” completa):**
-```text
-Elder_Wand Resurrection_Stone Invisibility_Cloak
-Death cannot be fooled, Only fools ramble with me. Go away before I ban you from my doors for eternity.!!
-Wand Stone Cloak
-```
-
-**Tentativa 2 (resposta abreviada):**
-```text
-Wand Stone Cloak
-Death cannot be fooled, Only fools ramble with me. Go away before I ban you from my doors for eternity.!!
-```
-
-**Raciocínio:**  
-O serviço parece validar uma resposta específica (provavelmente case-sensitive/format). Mesmo “acertando” a ideia, ele recusou — indicando que ou o formato exato é diferente, ou essa porta é só um “distraction service”/pista.
-
----
-
-## 6. Acesso SSH (com saída)
+## 4. Enumeração SSH
 
 **Comando:**
 ```bash
@@ -249,7 +180,7 @@ Welcome to Ubuntu 16.04.7 LTS (GNU/Linux 4.4.0-1112-aws x86_64)
 
 ---
 
-## 7. Enumeração de SUID (com saída)
+## 5. Enumeração de SUID (com saída)
 
 **Comando:**
 ```bash
@@ -304,7 +235,7 @@ O destaque aqui é o `/bin/ip` com SUID, que frequentemente permite abusos com *
 
 ---
 
-## 8. Privilégio Root via `/bin/ip` (com saída)
+## 6. Privilégio Root via `/bin/ip` 
 
 **Comandos:**
 ```bash
@@ -322,7 +253,7 @@ root
 
 ---
 
-## 9. Binário SUID custom `/etc/room_of_requirement` (extração de pista)
+## 7. Binário SUID custom `/etc/room_of_requirement` (extração de pista)
 
 **Comando:**
 ```bash
@@ -346,7 +277,7 @@ Invisibilty cloak: m5ktp!h970#ej0@8ja4hj8l00
 
 ---
 
-## 10. Busca final de flags (com saída)
+## 8. Busca final de flags (com saída)
 
 **Comando:**
 ```bash
@@ -376,4 +307,3 @@ grep -rE "THM\{|flag\{" /var /etc /opt /home /root /srv 2>/dev/null
 - **Root:** `THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}`
 - **Root Flag:** `THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}`
 
-**Final de Missão:** Hogwarts Pwned.
